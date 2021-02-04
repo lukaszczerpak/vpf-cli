@@ -1,0 +1,193 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "CREATE/CLONE POLICY VERSION",
+  "description" : "applied to create/clone policy version requests of form: POST /policies/{policyId}/versions ",
+  "version" : "1.0",
+  "type" : "object",
+  "properties" : {
+    "description" : {
+      "type" : [ "string", "null" ],
+      "maxLength" : 255
+    },
+    "matchRuleFormat" : {
+      "type" : "string",
+      "enum" : [ "1.0" ]
+    },
+    "matchRules" : {
+      "type" : [ "array", "null" ],
+      "maxItems" : 5000,
+      "items" : {
+        "$ref" : "#/definitions/matchRuleType"
+      }
+    }
+  },
+  "additionalProperties" : false,
+  "minProperties" : 1,
+  "definitions" : {
+    "matchRuleType" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : [ "string", "null" ],
+          "maxLength" : 8192
+        },
+        "type" : {
+          "type" : "string",
+          "enum" : [ "cdMatchRule" ]
+        },
+        "start" : {
+          "type" : "integer",
+          "minimum" : 0
+        },
+        "end" : {
+          "type" : "integer",
+          "minimum" : 0
+        },
+        "id" : {
+          "type" : [ "integer", "null" ]
+        },
+        "matches" : {
+          "type" : [ "array", "null" ],
+          "items" : {
+            "$ref" : "#/definitions/matchCriteriaType"
+          }
+        },
+        "akaRuleId" : {
+          "type" : "string"
+        },
+        "disabled" : {
+          "type" : "boolean"
+        },
+        "matchURL" : {
+          "type" : [ "string", "null" ],
+          "maxLength" : 8192
+        },
+        "forwardSettings" : {
+          "type" : "object",
+          "properties" : {
+            "originId" : {
+              "type" : "string",
+              "maxLength" : 8192
+            },
+            "percent" : {
+              "type" : "integer",
+              "minimum" : 1,
+              "maximum" : 100
+            }
+          },
+          "required" : [ "originId", "percent" ],
+          "additionalProperties" : false
+        },
+        "matchesAlways" : {
+          "type" : "boolean"
+        }
+      },
+      "additionalProperties" : false,
+      "required" : [ "forwardSettings" ],
+      "not" : {
+        "required" : [ "matches", "matchesAlways" ]
+      }
+    },
+    "matchCriteriaType" : {
+      "type" : "object",
+      "properties" : {
+        "caseSensitive" : {
+          "type" : "boolean"
+        },
+        "matchValue" : {
+          "type" : "string",
+          "minLength" : 1,
+          "maxLength" : 8192
+        },
+        "negate" : {
+          "type" : "boolean"
+        },
+        "matchOperator" : {
+          "type" : "string",
+          "enum" : [ "contains", "exists", "equals" ]
+        },
+        "matchType" : {
+          "type" : "string",
+          "enum" : [ "header", "hostname", "path", "extension", "query", "cookie", "deviceCharacteristics", "clientip", "continent", "countrycode", "regioncode", "protocol", "method", "proxy" ]
+        },
+        "checkIPs" : {
+          "type" : "string",
+          "enum" : [ null, "CONNECTING_IP", "XFF_HEADERS", "CONNECTING_IP XFF_HEADERS" ]
+        },
+        "objectMatchValue" : {
+          "$ref" : "#/definitions/objectMatchValueType"
+        }
+      },
+      "oneOf" : [ {
+        "required" : [ "matchType", "matchValue" ]
+      }, {
+        "required" : [ "matchType", "objectMatchValue" ]
+      } ],
+      "additionalProperties" : false
+    },
+    "objectMatchValueRangeOrSimpleSubtype" : {
+      "type" : "object",
+      "properties" : {
+        "type" : {
+          "type" : "string",
+          "enum" : [ "range", "simple" ]
+        },
+        "value" : {
+          "type" : [ "array", "null" ]
+        }
+      },
+      "required" : [ "type", "value" ],
+      "additionalProperties" : false
+    },
+    "objectMatchValueObjectSubtype" : {
+      "type" : "object",
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "minLength" : 1,
+          "maxLength" : 8192
+        },
+        "type" : {
+          "type" : "string",
+          "enum" : [ "object" ]
+        },
+        "nameCaseSensitive" : {
+          "type" : "boolean"
+        },
+        "nameHasWildcard" : {
+          "type" : "boolean"
+        },
+        "options" : {
+          "type" : "object",
+          "properties" : {
+            "value" : {
+              "type" : [ "array", "null" ]
+            },
+            "valueHasWildcard" : {
+              "type" : "boolean"
+            },
+            "valueCaseSensitive" : {
+              "type" : "boolean"
+            },
+            "valueEscaped" : {
+              "type" : "boolean"
+            }
+          },
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "name", "type" ],
+      "additionalProperties" : false
+    },
+    "objectMatchValueType" : {
+      "type" : "object",
+      "oneOf" : [ {
+        "$ref" : "#/definitions/objectMatchValueRangeOrSimpleSubtype"
+      }, {
+        "$ref" : "#/definitions/objectMatchValueObjectSubtype"
+      } ]
+    }
+  },
+  "additionalDescription" : "applied to as policy version requests for CD cloudlets",
+  "location" : "/api/v2/schemas/create-nimbus_policy_version-CD-1.0.json"
+}
