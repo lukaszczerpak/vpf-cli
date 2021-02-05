@@ -1,3 +1,7 @@
+import csv
+import json
+
+from akamaiopen.cloudlets.CloudletRule import CloudletRule
 from akamaiopen.cloudlets.VisitorPrioritizationRule import VisitorPrioritizationRule
 from akamaiopen.cloudlets.matches.CookieMatch import CookieMatch
 from akamaiopen.cloudlets.matches.Match import MatchOperator
@@ -30,13 +34,13 @@ class VpfqPolicy:
         vpr.matches.append(PathMatch(match_value='/*', match_operator=MatchOperator.CONTAINS))
         return vpr
 
-    def generate_json(self, ix, iy, segments, base_prob, description="automatically generated"):
+    def generate(self, ix, iy, segments, base_prob, description="automatically generated"):
         values = LinearInterpolation.generate_values(ix, iy, segments, base_prob)
 
         match_rules = []
         for s, p in values:
-            match_rules.append(self.__create_fq_rule(s, p, not s == segments).to_json())
-        match_rules.append(self.__create_default_rule().to_json())
+            match_rules.append(self.__create_fq_rule(s, p, not s == segments))
+        match_rules.append(self.__create_default_rule())
 
         policy = {
             "description": description,
@@ -45,3 +49,24 @@ class VpfqPolicy:
         }
 
         return policy
+
+
+class CloudletPolicyEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, CloudletRule):
+            return o.to_json()
+        return super(self, o)
+
+
+class VpfqPolicyExporter:
+    @staticmethod
+    def to_json(policy, output_file):
+        return json.dump(policy, output_file, cls=CloudletPolicyEncoder)
+
+    @staticmethod
+    def to_csv(policy, output_file):
+        fieldnames = ['ruleName', 'path', 'cookie', 'result.passThroughPercent']
+        writer = csv.DictWriter(output_file, fieldnames=fieldnames, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+        writer.writeheader()
+        for r in policy['matchRules']:
+            writer.writerow(r.to_csv())

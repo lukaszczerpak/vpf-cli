@@ -6,6 +6,7 @@ Features:
 
 * linear interpolation based on input data
 * variable number of segments
+* JSON and CSV outputs
 
 ## Usage
 
@@ -15,6 +16,7 @@ Usage: vpfq generate-policy [OPTIONS] OUTPUT_FILE
   Generate VPFQ policy
 
 Options:
+  --output-format [JSON|CSV]      [default: JSON]
   -s, --segments INTEGER RANGE    Number of segments  [default: 20]
   -d, --sample-data SAMPLE-DATA   Input data for interpolation  [default: (0,0), (1,0.1), (2,2), (4,6), (7,20), (9,50), (10,100)]
   -c, --cookie-name TEXT          VPFQ cookie name (akavpfq_<VP-instance-label>)  [required]

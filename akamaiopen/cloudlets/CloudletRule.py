@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABCMeta
+from collections import ChainMap
 
 
 class CloudletRule(object, metaclass=ABCMeta):
@@ -25,3 +26,9 @@ class CloudletRule(object, metaclass=ABCMeta):
             o['matches'] = list(map(lambda m: m.to_json(), self.matches))
 
         return o
+
+    def to_csv(self):
+        return {
+            "ruleName": self.name,
+            **dict(ChainMap(*list(map(lambda m: m.to_csv(), self.matches))))
+        }

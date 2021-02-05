@@ -30,6 +30,12 @@ class Match(object, metaclass=ABCMeta):
             "matchType": self.match_type()
         }
 
+    def to_csv(self):
+        v = "!" if self.negate else ""
+        v += ":" if self.case_sensitive else ""
+        v += self.match_value
+        return {self.match_type(): v}
+
     def from_csv(self, value):
         if not value:
             raise ValueError("Value cannot be null!")
