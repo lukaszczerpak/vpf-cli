@@ -1,6 +1,6 @@
-# VPFQ policy generator
+# VP policy generator
 
-This CLI generates Visitor Prioritization policy for Fair Queue model.
+This CLI generates Visitor Prioritization policy.
 
 Features:
 
